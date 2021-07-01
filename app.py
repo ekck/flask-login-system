@@ -1,5 +1,6 @@
 from flask import Flask , redirect , render_template, request
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash
 from flask_login import LoginManager , UserMixin , login_required ,login_user, logout_user,current_user
 app=Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///db.db'
@@ -15,6 +16,22 @@ class User(UserMixin,db.Model):
     username = db.Column(db.String(200))
     email = db.Column(db.String(200))
     password = db.Column(db.String(200))
+
+    @property
+    def password(self):
+        """
+        Prevent pasword from being accessed
+        """
+        raise AttributeError('password is not a readable attribute.')
+
+    @password.setter
+    def password(self, password):
+        """
+        Set password to a hashed password
+        """
+        self.password_hash = generate_password_hash(password)
+
+
 
 
 
