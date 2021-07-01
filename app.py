@@ -2,6 +2,7 @@ from flask import Flask , redirect , render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash
 from flask_login import LoginManager , UserMixin , login_required ,login_user, logout_user,current_user
+
 app=Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///db.db'
 app.config['SECRET_KEY']='619619'
