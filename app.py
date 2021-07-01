@@ -1,14 +1,13 @@
-from flask import Flask, redirect, render_template
+from flask import Flask , redirect , render_template, request
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_required
-
+from flask_login import LoginManager , UserMixin , login_required ,login_user, logout_user,current_user
 app=Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///db.db'
-app.config['SECRET_KEY']='616919'
+app.config['SECRET_KEY']='619619'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=True
 db = SQLAlchemy(app)
 
-login_manager= LoginManager()
+login_manager = LoginManager()
 login_manager.init_app(app)
 
 class User(UserMixin,db.Model):
@@ -18,23 +17,49 @@ class User(UserMixin,db.Model):
     password = db.Column(db.String(200))
 
 
+
 @login_manager.user_loader
 def get(id):
     return User.query.get(id)
 
 @app.route('/',methods=['GET'])
-#@login_required
+@login_required
 def get_home():
     return render_template('home.html')
 
 @app.route('/login',methods=['GET'])
-#@login_required
 def get_login():
     return render_template('login.html')
 
-#@app.route('/')
-#def get():
-#    return 'ok'
+
+@app.route('/signup',methods=['GET'])
+def get_signup():
+    return render_template('signup.html')
+
+@app.route('/login',methods=['POST'])
+def login_post():
+    email = request.form['email']
+    password = request.form['password']
+    user = User.query.filter_by(email=email).first()
+    login_user(user)
+    return redirect('/')
+
+@app.route('/signup',methods=['POST'])
+def signup_post():
+    username = request.form['username']
+    email = request.form['email']
+    password = request.form['password']
+    user = User(username=username,email=email,password=password)
+    db.session.add(user)
+    db.session.commit()
+    user = User.query.filter_by(email=email).first()
+    login_user(user)
+    return redirect('/')
+
+@app.route('/logout',methods=['GET'])
+def logout():
+    logout_user()
+    return redirect('/login')
 
 
 
